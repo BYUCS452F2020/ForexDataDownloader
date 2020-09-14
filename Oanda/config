@@ -1,0 +1,10 @@
+hostname: api-fxpractice.oanda.com
+streaming_hostname: stream-fxpractice.oanda.com
+port: 443
+ssl: true
+token: 0fdee14291db67f21f5185341842f29f-57bb33b027f07fac165ef555083d9bee
+username: cs452datadownloader
+datetime_format: UNIX
+accounts:
+- 101-001-16464625-001
+active_account: 101-001-16464625-001
