@@ -5,7 +5,9 @@ import uuid
 # TODO: create more methods that we need
 # TODO: add checks to make sure we don't create a user with a username that already exists, etc.
 # TODO: add more user parameters that we need
-"""Class for accessing the user table in the database"""
+"""
+A class for accessing the user table in the database
+"""
 class UserDao:
     """
     The init function sets up a database connection object, a list of available subscriptions, and the user database
