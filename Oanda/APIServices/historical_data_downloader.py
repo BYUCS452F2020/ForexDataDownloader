@@ -1,22 +1,95 @@
-import argparse
-import common.config
-import common.args
 import v20
-from Oanda.Config.config import Config
 from datetime import datetime
+from Oanda.Config.config import Config
 
+
+"""
+A class for downloading historical forex data
+"""
 class HistoricalDataDownloader:
+    """
+    The init function sets up valid values for various parameters that will need to be passed in before downloading
+    historical data
+    """
     def __init__(self):
-        pass
+        # A list of currency pairs that we can download data for
+        self.available_currency_pairs = ['EUR_USD', 'GBP_USD', 'USD_JPY', 'USD_CHF','USD_CAD', 'AUD_USD', 'NZD_USD',
+                                         'EUR_GBP', 'EUR_CHF', 'GBP_JPY']
 
-    # TODO: add checks to each input
-    # TODO: test
+        # A list of valid candle types
+        self.available_candle_types = ['bid', 'ask', 'mid']
+
+        # A list of valid time frame granularities (M1 = 1 minute, H4 = 4 hours, W = week, etc.)
+        self.available_time_frame_granularities = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W', 'M']
+
+    """
+    This is a helper function that will make sure the parameters passed to the historical data download function are 
+    valid
+    
+    Parameters:
+        currency_pair (str): The currency pair to grab data for
+        candle_types (str): The type of candles to get (bid, ask, or mid)
+        time_frame_granularity (str): The time frame to make each candle
+        from_time (str): The first date/time to grab the candles from
+        to_time (str): The last date/time to grab the candles from
+        
+    Returns:
+        A boolean (true if the parameters passes, false otherwise) and an error message (null if the parameters pass)
+    """
+    def _check_historical_data_parameters(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+        if currency_pair not in self.available_currency_pairs:
+            return False, 'Invalid currency pair'
+
+        if not set(candle_types).issubset(set(self.available_candle_types)):
+            return False, 'Invalid candle type'
+
+        if time_frame_granularity not in self.available_time_frame_granularities:
+            return False, 'Invalid time frame granularity'
+
+        try:
+            datetime.strptime(from_time, '%Y-%m-%d %H:%M:%S')
+            datetime.strptime(to_time, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return False, 'Invalid from/to date'
+
+        return True, None
+
+    """
+    This is the main function for grabbing historical data
+    
+    Parameters:
+        currency_pair (str): The currency pair to grab data for
+        candle_types (str): The type of candles to get (bid, ask, or mid)
+        time_frame_granularity (str): The time frame to make each candle
+        from_time (str): The first date/time to grab the candles from
+        to_time (str): The last date/time to grab the candles from
+        
+    Returns:
+        A list of the candles (null if the parameters are incorrect or if there was an error) and an error message 
+        (null if the data download was successful)
+    """
     def get_historical_data(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+        valid_params, error_message = self._check_historical_data_parameters(currency_pair, candle_types,
+                                                                             time_frame_granularity, from_time,
+                                                                             to_time)
+
+        if not valid_params:
+            return None, error_message
+
+        api_context = v20.Context(
+            Config.get_host_name(),
+            Config.get_port(),
+            Config.get_ssl(),
+            application="sample_code",
+            token=Config.get_api_token(),
+            datetime_format=Config.get_date_format()
+        )
+
         kwargs = {}
 
         kwargs['granularity'] = time_frame_granularity
-        kwargs['fromTime'] = from_time
-        kwargs['toTime'] = to_time
+        kwargs['fromTime'] = api_context.datetime_to_str(datetime.strptime(from_time, '%Y-%m-%d %H:%M:%S'))
+        kwargs['toTime'] = api_context.datetime_to_str(datetime.strptime(to_time, '%Y-%m-%d %H:%M:%S'))
 
         for candle_type in candle_types:
             if candle_type == 'bid':
@@ -28,175 +101,9 @@ class HistoricalDataDownloader:
             elif candle_type == 'mid':
                 kwargs['price'] = 'M' + kwargs.get('price', '')
 
-        api_context = v20.Context(
-            Config.get_host_name(),
-            Config.get_port(),
-            Config.get_ssl(),
-            application="sample_code",
-            token=Config.get_api_token(),
-            datetime_format=Config.get_date_format()
-        )
-
         response = api_context.instrument.candles(currency_pair, **kwargs)
 
         if response.status != 200:
-            print(response)
-            print(response.body)
-            return
+            return None, response + '\n' + response.body
 
-        candles = response.get("candles", 200)
-
-        for candle in candles:
-            print(candle)
-
-def main():
-    """
-    Create an API context, and use it to fetch candles for an instrument.
-
-    The configuration for the context is parsed from the config file provided
-    as an argumentV
-    """
-
-    parser = argparse.ArgumentParser()
-
-    #
-    # The config object is initialized by the argument parser, and contains
-    # the REST APID host, port, accountID, etc.
-    #
-    common.config.add_argument(parser)
-
-    parser.add_argument(
-        "instrument",
-        type=common.args.instrument,
-        help="The instrument to get candles for"
-    )
-
-    parser.add_argument(
-        "--mid",
-        action='store_true',
-        help="Get midpoint-based candles"
-    )
-
-    parser.add_argument(
-        "--bid",
-        action='store_true',
-        help="Get bid-based candles"
-    )
-
-    parser.add_argument(
-        "--ask",
-        action='store_true',
-        help="Get ask-based candles"
-    )
-
-    parser.add_argument(
-        "--smooth",
-        action='store_true',
-        help="'Smooth' the candles"
-    )
-
-    parser.set_defaults(mid=False, bid=False, ask=False)
-
-    parser.add_argument(
-        "--granularity",
-        default=None,
-        help="The candles granularity to fetch"
-    )
-
-    parser.add_argument(
-        "--count",
-        default=None,
-        help="The number of candles to fetch"
-    )
-
-    date_format = "%Y-%m-%d %H:%M:%S"
-
-    parser.add_argument(
-        "--from-time",
-        default=None,
-        type=common.args.date_time(),
-        help="The start date for the candles to be fetched. Format is 'YYYY-MM-DD HH:MM:SS'"
-    )
-
-    parser.add_argument(
-        "--to-time",
-        default=None,
-        type=common.args.date_time(),
-        help="The end date for the candles to be fetched. Format is 'YYYY-MM-DD HH:MM:SS'"
-    )
-
-    parser.add_argument(
-        "--alignment-timezone",
-        default=None,
-        help="The timezone to used for aligning daily candles"
-    )
-
-    args = parser.parse_args()
-
-    account_id = args.config.active_account
-
-    #
-    # The v20 config object creates the v20.Context for us based on the
-    # contents of the config file.
-    #
-    api = args.config.create_context()
-
-    kwargs = {}
-
-    if args.granularity is not None:
-        kwargs["granularity"] = args.granularity
-
-    if args.smooth is not None:
-        kwargs["smooth"] = args.smooth
-
-    if args.count is not None:
-        kwargs["count"] = args.count
-
-    if args.from_time is not None:
-        kwargs["fromTime"] = api.datetime_to_str(args.from_time)
-
-    if args.to_time is not None:
-        kwargs["toTime"] = api.datetime_to_str(args.to_time)
-
-    if args.alignment_timezone is not None:
-        kwargs["alignmentTimezone"] = args.alignment_timezone
-
-    price = "mid"
-
-    if args.mid:
-        kwargs["price"] = "M" + kwargs.get("price", "")
-        price = "mid"
-
-    if args.bid:
-        kwargs["price"] = "B" + kwargs.get("price", "")
-        price = "bid"
-
-    if args.ask:
-        kwargs["price"] = "A" + kwargs.get("price", "")
-        price = "ask"
-
-    #
-    # Fetch the candles
-    #
-    response = api.instrument.candles(args.instrument, **kwargs)
-
-    if response.status != 200:
-        print(response)
-        print(response.body)
-        return
-
-    print("Instrument: {}".format(response.get("instrument", 200)))
-    print("Granularity: {}".format(response.get("granularity", 200)))
-
-    printer = CandlePrinter()
-
-    printer.print_header()
-
-    candles = response.get("candles", 200)
-
-    for candle in response.get("candles", 200):
-        printer.print_candle(candle)
-
-
-if __name__ == "__main__":
-    main()
+        return response.get("candles", 200), None

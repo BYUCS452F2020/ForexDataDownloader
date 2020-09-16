@@ -9,6 +9,7 @@ config_vars = {
     'account': '101-001-16464625-001'
 }
 
+
 class Config(object):
 
     @staticmethod
