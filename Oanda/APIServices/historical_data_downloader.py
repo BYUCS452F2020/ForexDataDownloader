@@ -37,21 +37,26 @@ class HistoricalDataDownloader:
         A boolean (true if the parameters passes, false otherwise) and an error message (null if the parameters pass)
     """
     def _check_historical_data_parameters(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+        # Check if the currency pair is valid
         if currency_pair not in self.available_currency_pairs:
             return False, 'Invalid currency pair'
 
+        # Check if the candle type is valid
         if not set(candle_types).issubset(set(self.available_candle_types)):
             return False, 'Invalid candle type'
 
+        # Check if the time frame granularity is valid
         if time_frame_granularity not in self.available_time_frame_granularities:
             return False, 'Invalid time frame granularity'
 
+        # Check if the from time and to time dates are valid
         try:
             datetime.strptime(from_time, '%Y-%m-%d %H:%M:%S')
             datetime.strptime(to_time, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             return False, 'Invalid from/to date'
 
+        # If all the checks pass, return True plus a null error message
         return True, None
 
     """
@@ -69,13 +74,16 @@ class HistoricalDataDownloader:
         (null if the data download was successful)
     """
     def get_historical_data(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+        # Check the parameters
         valid_params, error_message = self._check_historical_data_parameters(currency_pair, candle_types,
                                                                              time_frame_granularity, from_time,
                                                                              to_time)
 
+        # If the parameters aren't valid, return null for the candles data as well as the error message
         if not valid_params:
             return None, error_message
 
+        # Create the Oanda API context
         api_context = v20.Context(
             Config.get_host_name(),
             Config.get_port(),
@@ -85,8 +93,8 @@ class HistoricalDataDownloader:
             datetime_format=Config.get_date_format()
         )
 
+        # Create the key word arguments for the API
         kwargs = {}
-
         kwargs['granularity'] = time_frame_granularity
         kwargs['fromTime'] = api_context.datetime_to_str(datetime.strptime(from_time, '%Y-%m-%d %H:%M:%S'))
         kwargs['toTime'] = api_context.datetime_to_str(datetime.strptime(to_time, '%Y-%m-%d %H:%M:%S'))
@@ -101,9 +109,12 @@ class HistoricalDataDownloader:
             elif candle_type == 'mid':
                 kwargs['price'] = 'M' + kwargs.get('price', '')
 
+        # Use the Oanda API context as well as the key word arguments to get the historical currency data
         response = api_context.instrument.candles(currency_pair, **kwargs)
 
+        # If the API call was unsucessful, return null for the candles data as well as the response error message
         if response.status != 200:
             return None, response + '\n' + response.body
 
+        # Otherwise, return the candles data and null for the error message
         return response.get("candles", 200), None
