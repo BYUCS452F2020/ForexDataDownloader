@@ -8,7 +8,7 @@ class UserDao:
     def __init__(self):
         self.connection = None
         self.available_subscription_types = ['basic', 'advanced']
-        # CHANGE THIS FILE PATH TO WHEREEVER THE DB FILE IS LOCATED ON YOUR COMPUTER
+        # CHANGE THIS FILE PATH TO WHEREVER THE DB FILE IS LOCATED ON YOUR COMPUTER
         self.db_file_path = '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/users.db'
 
     def _create_user_table(self):
