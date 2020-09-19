@@ -114,7 +114,7 @@ class HistoricalDataDownloader:
 
         # If the API call was unsucessful, return null for the candles data as well as the response error message
         if response.status != 200:
-            return None, response + '\n' + response.body
+            return None, str(response) + '\n' + str(response.body)
 
         # Otherwise, return the candles data and null for the error message
         return response.get("candles", 200), None
