@@ -26,6 +26,10 @@ class Handler(BaseHTTPRequestHandler):
         # self.send_header('Content-type', 'text/html')
         self.end_headers()
 
+    # TODO: check for errors and send 404 responses accordingly
+    # TODO: add docs/comments
+    # TODO: double check that everything aligns properly with the service facade (items that are returned, input parameters, etc.)
+    # TODO: test everything
     def do_GET(self):
         if self.path == '/getAvailablePairs':
             pairs = self.service_facade.get_available_currency_pairs()
@@ -49,18 +53,6 @@ class Handler(BaseHTTPRequestHandler):
 
             self.wfile.write(followed_pairs_json.encode())
 
-        elif self.path == '/updatePairsFollowed':
-            content_len = int(self.headers['Content-Length'])
-            post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
-
-            user_id = request_body['user_id']
-            currency_pair_name = request_body['currency_pair_name']
-
-            self.service_facade.update_pairs_followed_for_user(user_id, currency_pair_name)
-
-            self._send_response(200)
-
         elif self.path == '/getFollowedPairsLeft':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
@@ -83,10 +75,11 @@ class Handler(BaseHTTPRequestHandler):
             currency_pair = request_body['currency_pair']
             time_frame_granularity = request_body['time_frame_granularity']
             from_time = request_body['from_time']
+            from_time = from_time.replace('+', ' ')
+            from_time = from_time.replace('%3A', ':')
             to_time = request_body['to_time']
-
-            print(from_time)
-            print(to_time)
+            to_time = to_time.replace('+', ' ')
+            to_time = to_time.replace('%3A', ':')
 
             candles, error_message = self.service_facade.get_historical_data(currency_pair, time_frame_granularity,
                                                                              from_time, to_time)
@@ -95,16 +88,72 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(error_message.encode())
 
             else:
-                candles_json = json.dumps(candles)
+                candles_json = candles.to_json(orient='records')
 
                 self._send_response(200)
 
                 self.wfile.write(candles_json.encode())
 
-    # TODO: implement this
+    # TODO: check for errors and send 404 responses accordingly
+    # TODO: add docs/comments
+    # TODO: double check that everything aligns properly with the service facade (items that are returned, input parameters, etc.)
+    # TODO: test everything
     def do_POST(self):
-        pass
+        if self.path == '/updatePairsFollowed':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = self._format_request_body(post_body)
 
+            user_id = request_body['user_id']
+            currency_pair_name = request_body['currency_pair_name']
+
+            self.service_facade.update_pairs_followed_for_user(user_id, currency_pair_name)
+
+            self._send_response(200)
+
+        elif self.path == '/updateSubscription':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = self._format_request_body(post_body)
+
+            user_id = request_body['user_id']
+            subscription_type = request_body['subscription_type']
+
+            self.service_facade.update_subscription(user_id, subscription_type)
+
+            self._send_response(200)
+
+        elif self.path == '/createUser':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = self._format_request_body(post_body)
+
+            username = request_body['username']
+            first_name = request_body['first_name']
+            last_name = request_body['last_name']
+            subscription_type = request_body['subscription_type']
+
+            user_id = self.service_facade.create_user(username, first_name, last_name, subscription_type)
+            user_id_json = json.dumps(user_id)
+
+            self._send_response(200)
+
+            self.wfile.write(user_id_json.encode())
+
+        elif self.path == '/login':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = self._format_request_body(post_body)
+
+            username = request_body['username']
+            password = request_body['password']
+
+            user_id = self.service_facade.login(username, password)
+            user_id_json = json.dumps(user_id)
+
+            self._send_response(200)
+
+            self.wfile.write(user_id_json.encode())
 
 
 def main():

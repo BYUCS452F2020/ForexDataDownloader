@@ -11,5 +11,5 @@ class UserService:
         pass
 
     # TODO: implement and add docs when user dao is implemented
-    def login(self, username):
+    def login(self, username, password):
         pass

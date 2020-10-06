@@ -67,9 +67,10 @@ class ServiceFacade:
             pass
 
     # TODO: finish and add docs when user service is fully implemented
-    def create_user(self, username, first_name, last_name):
-        self.user_service.create_user(username, first_name, last_name)
+    def create_user(self, username, first_name, last_name, subscription_type):
+        user_id = self.user_service.create_user(username, first_name, last_name)
+        self.create_subscription(user_id, subscription_type)
 
     # TODO: finish and add docs when user service is fully implemented
-    def login(self, username):
-        self.user_service.login(username)
+    def login(self, username, password):
+        self.user_service.login(username, password)

@@ -101,6 +101,7 @@ class DataDownloadService:
             return None, error_message
 
         # If there wasn't an error, format the historical currency/candle data as a data frame
+        candle_types = ['bid', 'ask']
         candles_df = self._format_candle_data(candles, candle_types)
 
         # Return the data frame and null for the error message
