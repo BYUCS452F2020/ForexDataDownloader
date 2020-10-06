@@ -20,14 +20,14 @@ class ServiceFacade:
 
     # TODO: finish and add docs when currency pair service is fully implemented
     def get_pairs_followed_for_user(self, user_id):
-        pairs_followd_for_user = self.currency_pair_service.get_pairs_followed_for_user(user_id)
+        pairs_followed_for_user = self.currency_pair_service.get_pairs_followed_for_user(user_id)
 
     # TODO: finish and add docs when currency pair service is fully implemented
-    def update_pairs_followed_for_user(self, user_id, currency_pair_id):
+    def update_pairs_followed_for_user(self, user_id, currency_pair_name):
         pairs_left = self.get_followed_pairs_left_for_user(user_id)
 
         if pairs_left != -math.inf and pairs_left > 0:
-            self.currency_pair_service.update_pairs_followed_for_user(user_id, currency_pair_id)
+            self.currency_pair_service.update_pairs_followed_for_user(user_id, currency_pair_name)
             self.update_followed_pairs_left_for_user(user_id)
 
     # TODO: finish and add docs when currency pair service is fully implemented
@@ -40,10 +40,9 @@ class ServiceFacade:
         self.currency_pair_service.update_pairs_followed_for_user(user_id, change_amount)
 
     # TODO: test this and possibly change the format of the returned candle data
-    def get_historical_data(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
-        candles, error_message = self.data_download_service.get_historical_data(currency_pair, candle_types,
-                                                                                time_frame_granularity, from_time,
-                                                                                to_time)
+    def get_historical_data(self, currency_pair, time_frame_granularity, from_time, to_time):
+        candles, error_message = self.data_download_service.get_historical_data(currency_pair, time_frame_granularity,
+                                                                                from_time, to_time)
 
         return candles, error_message
 

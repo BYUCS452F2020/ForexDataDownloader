@@ -91,11 +91,10 @@ class DataDownloadService:
         A data frame of the candles (null if the parameters are incorrect or if there was an error) and an error message 
         (null if the data retrieval was successful)
     """
-    def get_historical_data(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+    def get_historical_data(self, currency_pair, time_frame_granularity, from_time, to_time):
         # Call the Oanda data download service in order to get the historical currency data
-        candles, error_message = self.oanda_data_downloader.get_historical_data(currency_pair, candle_types,
-                                                                                time_frame_granularity, from_time,
-                                                                                to_time)
+        candles, error_message = self.oanda_data_downloader.get_historical_data(currency_pair, time_frame_granularity,
+                                                                                from_time, to_time)
 
         # Return null for the candle data frame plus the error message if there was an error when retrieving the data
         if error_message is not None:

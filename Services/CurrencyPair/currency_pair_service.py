@@ -16,7 +16,7 @@ class CurrencyPairService:
         pass
 
     # TODO: implement and add docs when pair followed dao is implemented
-    def update_pairs_followed_for_user(self, user_id, currency_pair_id):
+    def update_pairs_followed_for_user(self, user_id, currency_pair_name):
         pass
 
     # TODO: implement and add docs when followed pairs left dao is implemented

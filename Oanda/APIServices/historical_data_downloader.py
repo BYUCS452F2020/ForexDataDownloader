@@ -73,11 +73,14 @@ class HistoricalDataDownloader:
         A list of the candles (null if the parameters are incorrect or if there was an error) and an error message 
         (null if the data download was successful)
     """
-    def get_historical_data(self, currency_pair, candle_types, time_frame_granularity, from_time, to_time):
+    def get_historical_data(self, currency_pair, time_frame_granularity, from_time, to_time):
+        # Initialize the candle types - we'll just restrict them to the bid and ask prices since no one really cares
+        # about the mid prices
+        candle_types = ['bid', 'ask']
+
         # Check the parameters
         valid_params, error_message = self._check_historical_data_parameters(currency_pair, candle_types,
-                                                                             time_frame_granularity, from_time,
-                                                                             to_time)
+                                                                             time_frame_granularity, from_time, to_time)
 
         # If the parameters aren't valid, return null for the candles data as well as the error message
         if not valid_params:
