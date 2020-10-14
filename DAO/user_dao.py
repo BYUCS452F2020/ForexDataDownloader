@@ -21,7 +21,8 @@ class UserDao:
         self.available_subscription_types = ['basic', 'advanced']
 
         # CHANGE THIS FILE PATH TO WHEREVER THE DB FILE IS LOCATED ON YOUR COMPUTER
-        self.db_file_path = '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/forex.db'
+        # self.db_file_path = '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/forex.db'
+        self.db_file_path = 'C:/Users/Caleb-PC/PycharmProjects/ForexDataDownloader/Database/forex.db'
 
     """
     A private function that will create the user table -- WARNING: if the database already exists, this will
@@ -41,9 +42,7 @@ class UserDao:
                          username text,
                          first_name text,
                          last_name text,
-                         email text,
-                         subscription_type text,
-                         reset_available integer
+                         password text
                          )""")
 
         self.connection.commit()
@@ -76,22 +75,46 @@ class UserDao:
     Returns:
         A boolean indicating whether the parameters are valid
     """
-    def _check_insert_new_user_parameters(self, username, first_name, last_name, email, subscription_type):
+    def _check_insert_new_user_parameters(self, username, first_name, last_name):
         # Check the parameter data types
-        if not isinstance(username, str) or not isinstance(first_name, str) or not isinstance(last_name, str) or not \
-                isinstance(email, str) or not isinstance(subscription_type, str):
+        if not isinstance(username, str) or not isinstance(first_name, str) or not isinstance(last_name, str) :
             return False
 
         # Make sure the parameters aren't empty
-        if len(username) == 0 or len(first_name) == 0 or len(last_name) == 0 or len(email) == 0 or len(subscription_type) == 0:
-            return False
-
-        # Make sure the subscription type is valid
-        if subscription_type not in self.available_subscription_types:
+        if len(username) == 0 or len(first_name) == 0 or len(last_name) == 0:
             return False
 
         # Return True if all checks pass
         return True
+
+    """
+        A helper function for checking if username is already in use before creating a user
+
+        Parameters:
+            username (str): The username for the new user
+
+        Returns:
+            True if username already in use, False if username is not
+        """
+
+    def _check_user_exists(self, username):
+        # Connect to the database
+        self.connection = sqlite3.connect(self.db_file_path)
+        cursor = self.connection.cursor()
+
+        # Drop the user table if it already exists
+        cursor.execute('''SELECT username 
+                            FROM users
+                            WHERE username = ?''', (username,))
+        result = cursor.fetchone()
+
+        self.connection.commit()
+        self.connection.close()
+
+        if result is None:
+            return False
+        else:
+            return True
 
     """
     A helper function for generating a unique user ID for a new user
@@ -121,13 +144,16 @@ class UserDao:
     Returns:
         A boolean indicating if the insertion was successful and an error message (null if successful)
     """
-    def insert_new_user(self, username, first_name, last_name, email, subscription_type):
+    def insert_new_user(self, username, first_name, last_name, password):
         # Make sure the parameters are valid
-        valid_parameters = self._check_insert_new_user_parameters(username, first_name, last_name, email, subscription_type)
+        valid_parameters = self._check_insert_new_user_parameters(username, first_name, last_name)
 
         # Return False plus an error message if the parameters are invalid
         if not valid_parameters:
             return False, 'Invalid new user parameters'
+
+        if self._check_user_exists(username):
+            return False, 'Username already in use'
 
         # Generate a new user ID
         new_user_id = self._generate_user_id(username, first_name, last_name)
@@ -137,10 +163,8 @@ class UserDao:
         cursor = self.connection.cursor()
 
         # Insert the new user into the user table
-        cursor.execute("INSERT INTO users VALUES ('{}', '{}', '{}', '{}', '{}', '{}', {})".format(new_user_id, username,
-                                                                                                  first_name, last_name,
-                                                                                                  email,
-                                                                                                  subscription_type, 1))
+        cursor.execute("INSERT INTO users VALUES ('{}', '{}', '{}', '{}', '{}')".format(new_user_id, username,
+                                                                                first_name, last_name, password))
 
         self.connection.commit()
         self.connection.close()
@@ -201,3 +225,51 @@ class UserDao:
 
         # Return the user and a null error message
         return user, None
+
+    """
+    A function that returns a user with matching user_id
+    
+    Parameters: 
+        user_id (str): the user_id to search the database for
+    
+    Returns:
+        The user (null if the transaction was unsuccessful) and an error message (null if successful)
+    """
+
+    def get_user_by_userid(self, user_id):
+        # Connect to the database
+        self.connection = sqlite3.connect(self.db_file_path)
+        cursor = self.connection.cursor()
+
+        # Get the user based on their first and last name
+        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        user = cursor.fetchone()
+
+        self.connection.commit()
+        self.connection.close()
+
+        # Return the user and a null error message
+        return user, None
+
+    """
+    Function to change user_id. 
+    FOR TESTING PURPOSES ONLY
+    
+    Parameters:
+        change (str): user_id to change to
+    
+    Returns:
+        A boolean indicating whether the change was successful and and error message (null if successful)
+    """
+    def _change_user_id(self, username, change):
+        # Connect to the database
+        self.connection = sqlite3.connect(self.db_file_path)
+        cursor = self.connection.cursor()
+
+        # Get the user based on their first and last name
+        cursor.execute("UPDATE users SET user_id = ? WHERE username = ?", (change, username))
+
+        self.connection.commit()
+        self.connection.close()
+
+        return True, None
