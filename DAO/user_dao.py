@@ -1,5 +1,6 @@
 import sqlite3
 import uuid
+from Oanda.Config.config import Config
 
 
 # TODO: create more methods that we need
@@ -8,7 +9,7 @@ import uuid
 """
 A class for accessing the user table in the database
 """
-class UserDao:
+class UserDAO:
     """
     The init function sets up a database connection object, a list of available subscriptions, and the user database
     file path
@@ -20,9 +21,8 @@ class UserDao:
         # A list of available subscription types
         self.available_subscription_types = ['basic', 'advanced']
 
-        # CHANGE THIS FILE PATH TO WHEREVER THE DB FILE IS LOCATED ON YOUR COMPUTER
-        # self.db_file_path = '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/forex.db'
-        self.db_file_path = 'C:/Users/Caleb-PC/PycharmProjects/ForexDataDownloader/Database/forex.db'
+        # File path to the database
+        self.db_file_path = Config.get_db_file_path()
 
     """
     A private function that will create the user table -- WARNING: if the database already exists, this will

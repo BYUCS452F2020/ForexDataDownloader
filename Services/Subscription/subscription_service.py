@@ -13,3 +13,7 @@ class SubscriptionService:
     # TODO: implement and add docs when subscription dao is implemented
     def update_subscription(self, user_id, subscription_type, subscription_cost):
         pass
+
+    # TODO: implement and add docs when subscription dao is implemented
+    def get_monthly_bill(self, user_id):
+        pass
