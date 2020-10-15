@@ -1,11 +1,12 @@
 import sqlite3
 import uuid
+from Oanda.Config.config import Config
+
 
 class PairsFollowedDAO:
     def __init__(self):
         self.connection = None
-
-        self.db_file_path = 'C:/Users/Caleb-PC/PycharmProjects/ForexDataDownloader/Database/forex.db'
+        self.db_file_path = Config.get_db_file_path()
 
     """
         A private function that will create the pairs_followed table -- WARNING: if the database already exists, this will
@@ -72,22 +73,3 @@ class PairsFollowedDAO:
         self.connection.close()
 
         return pairs_followed, None
-
-    # TODO: Not sure if we want this as a seperate function or done simultaneously with getting followed pairs
-    def get_num_pairs_followed(self, user_id):
-        # Connect to the database
-        self.connection = sqlite3.connect(self.db_file_path)
-        cursor = self.connection.cursor()
-
-        # Get the user based on their first and last name
-        cursor.execute("SELECT COUNT(*) FROM pairs_followed WHERE user_id = ?", (user_id,))
-        num_pairs_followed = cursor.fetchall()
-
-        self.connection.commit()
-        self.connection.close()
-
-        return num_pairs_followed, None
-
-
-
-

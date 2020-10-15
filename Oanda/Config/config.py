@@ -6,7 +6,8 @@ config_vars = {
     'api_token': '0fdee14291db67f21f5185341842f29f-57bb33b027f07fac165ef555083d9bee',
     'username': 'cs452datadownloader',
     'date_format': 'UNIX',
-    'account': '101-001-16464625-001'
+    'account': '101-001-16464625-001',
+    'db_file_path': '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/forex.db'
 }
 
 
@@ -43,3 +44,7 @@ class Config(object):
     @staticmethod
     def get_account():
         return config_vars['account']
+
+    @staticmethod
+    def get_db_file_path():
+        return config_vars['db_file_path']

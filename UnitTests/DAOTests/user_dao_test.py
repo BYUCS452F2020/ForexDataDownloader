@@ -1,10 +1,11 @@
 import unittest
-from DAO.user_dao import UserDao
+from DAO.user_dao import UserDAO
+
 
 # TODO: add more tests for failures, etc.
 class UserDaoTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.user_dao = UserDao()
+        self.user_dao = UserDAO()
 
     def test_insert_new_user_username_fail(self):
         self.user_dao._create_user_table()

@@ -1,11 +1,12 @@
 import sqlite3
 import uuid
+from Oanda.Config.config import Config
+
 
 class CurrencyPairDAO:
     def __init__(self):
         self.connection = None
-
-        self.db_file_path = 'C:/Users/Caleb-PC/PycharmProjects/ForexDataDownloader/Database/forex.db'
+        self.db_file_path = Config.get_db_file_path()
 
     """
         A private function that will create the pairs_followed table -- WARNING: if the database already exists, this will
@@ -89,4 +90,3 @@ class CurrencyPairDAO:
         self.connection.close()
 
         return result, None
-
