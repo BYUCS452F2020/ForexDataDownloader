@@ -1,6 +1,7 @@
 import unittest
 from DAO.pairs_followed_dao import PairsFollowedDAO
 
+
 # TODO: add more tests for failures, etc.
 class PairsFollowedDaoTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -19,7 +20,7 @@ class PairsFollowedDaoTest(unittest.TestCase):
         self.pairs_followed_dao.insert_new_pair_followed('user_id123', 'curr_pair123')
         success, error_message = self.pairs_followed_dao.get_pairs_followed('user_id123')
 
-        self.assertEqual(success[0][2], 'curr_pair123')
+        self.assertEqual(success[0][0], 'curr_pair123')
 
         self.assertTrue(success)
 

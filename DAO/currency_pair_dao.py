@@ -83,7 +83,7 @@ class CurrencyPairDAO:
         cursor = self.connection.cursor()
 
         # Drop the user table if it already exists
-        cursor.execute("SELECT * FROM currency_pairs")
+        cursor.execute("SELECT currency_name FROM currency_pairs")
         result = cursor.fetchall()
 
         self.connection.commit()
