@@ -1,34 +1,29 @@
-# TODO: get imports once the needed modules are implemented
 from DAO.currency_pair_dao import CurrencyPairDAO
+from DAO.followed_pairs_left_dao import FollowedPairsLeftDAO
+from DAO.pairs_followed_dao import PairsFollowedDAO
 
-# TODO: add docs once service is implemented
+
+# TODO: add docs
 class CurrencyPairService:
     def __init__(self):
-        self.pair_followed_dao = None  # TODO: get the actual pair followed dao once it's implemented
-        self.followed_pairs_left_dao = None  # TODO: get the actual followed pairs left dao once it's implemented
         self.currency_pair_dao = CurrencyPairDAO()
+        self.followed_pairs_left_dao = FollowedPairsLeftDAO()
+        self.pair_followed_dao = PairsFollowedDAO()
 
-    # TODO: implement and add docs when currency pairs dao is implemented
-    # CALEB
     def get_available_currency_pairs(self):
         return self.currency_pair_dao.get_all_currency_pairs()
 
-    # TODO: implement and add docs when pair followed dao is implemented
-    # CALEB
     def get_pairs_followed_for_user(self, user_id):
-        pass
+        return self.pair_followed_dao.get_pairs_followed(user_id)
 
-    # TODO: implement and add docs when pair followed dao is implemented
-    # CALEB
     def update_pairs_followed_for_user(self, user_id, currency_pair_name):
-        pass
+        return self.pair_followed_dao.insert_new_pair_followed(user_id, currency_pair_name)
 
-    # TODO: implement and add docs when followed pairs left dao is implemented
-    # POMAR
     def get_followed_pairs_left_for_user(self, user_id):
-        pass
+        return self.followed_pairs_left_dao.get_followed_pairs_left(user_id)
 
-    # TODO: implement and add docs when followed pairs left dao is implemented
-    # POMAR
-    def update_followed_pairs_left_for_user(self, user_id, change_amount):
-        pass
+    def update_followed_pairs_left_for_user(self, user_id, num_pairs_available):
+        return self.followed_pairs_left_dao.update_followed_pairs_left(user_id, num_pairs_available)
+
+    def decrement_followed_pairs_left(self, user_id):
+        return self.followed_pairs_left_dao.decrement_followed_pairs_left(user_id)

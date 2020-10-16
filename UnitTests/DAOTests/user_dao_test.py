@@ -10,28 +10,28 @@ class UserDaoTest(unittest.TestCase):
     def test_insert_new_user_username_fail(self):
         self.user_dao._create_user_table()
 
-        success, error_message = self.user_dao.insert_new_user('', 'Billy', 'Bob', 'password')
+        user_id, error_message = self.user_dao.insert_new_user('', 'Billy', 'Bob', 'password')
 
         self.assertEqual(error_message, 'Invalid new user parameters')
 
     def test_insert_new_user_name_fail(self):
         self.user_dao._create_user_table()
 
-        success, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', '', 'password')
+        user_id, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', '', 'password')
 
         self.assertEqual(error_message, 'Invalid new user parameters')
 
     def test_insert_new_user_success(self):
         self.user_dao._create_user_table()
 
-        success, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
+        user_id, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
 
-        self.assertTrue(success)
+        self.assertIsNotNone(user_id)
 
     def test_get_user_by_name_success(self):
         self.user_dao._create_user_table()
 
-        success, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
+        user_id, error_message = self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
         user, error_message = self.user_dao.get_user_by_name('Billy', 'Bob')
 
         self.assertIsNotNone(user)
@@ -40,7 +40,7 @@ class UserDaoTest(unittest.TestCase):
         self.user_dao._create_user_table()
 
         self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
-        success, error_message = self.user_dao.insert_new_user('billybob123', 'Bill', 'Bob', 'password')
+        user_id, error_message = self.user_dao.insert_new_user('billybob123', 'Bill', 'Bob', 'password')
 
         self.assertEqual(error_message, 'Username already in use')
 
@@ -49,18 +49,43 @@ class UserDaoTest(unittest.TestCase):
 
         self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
         self.user_dao._change_user_id('billybob123', '123')
-        success, error_message = self.user_dao.get_user_by_name('Billy', 'Bob')
+        user, error_message = self.user_dao.get_user_by_name('Billy', 'Bob')
 
-        self.assertTrue(success)
+        self.assertIsNotNone(user)
 
     def test_get_user_by_user_id(self):
         self.user_dao._create_user_table()
 
         self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'password')
         self.user_dao._change_user_id('billybob123', '123')
-        success, error_message = self.user_dao.get_user_by_userid('123')
+        user, error_message = self.user_dao.get_user_by_userid('123')
 
-        self.assertTrue(success)
+        self.assertIsNotNone(user)
+
+    def test_login_username_fail(self):
+        self.user_dao._create_user_table()
+
+        self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'crappy_password')
+        user_id, error_message = self.user_dao.login('billybob12', 'crappy_password')
+
+        self.assertIsNone(user_id)
+
+    def test_login_password_fail(self):
+        self.user_dao._create_user_table()
+
+        self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'crappy_password')
+        user_id, error_message = self.user_dao.login('billybob123', 'crappy_passwrd')
+
+        self.assertIsNone(user_id)
+
+    def test_login_success(self):
+        self.user_dao._create_user_table()
+
+        self.user_dao.insert_new_user('billybob123', 'Billy', 'Bob', 'crappy_password')
+        user_id, error_message = self.user_dao.login('billybob123', 'crappy_password')
+
+        self.assertIsNotNone(user_id)
+        self.assertTrue('billybob123' in user_id[0])
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import unittest
 from DAO.currency_pair_dao import CurrencyPairDAO
 
+
 # TODO: add more tests for failures, etc.
 class CurrencyPairDaoTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -21,9 +22,9 @@ class CurrencyPairDaoTest(unittest.TestCase):
         self.currency_pair_dao.add_currency_pair('USD/JPY')
         self.currency_pair_dao.add_currency_pair('GBP/USD')
 
-        success, error_message = self.currency_pair_dao.get_all_currency_pairs()
+        pairs, error_message = self.currency_pair_dao.get_all_currency_pairs()
 
-        self.assertIsNotNone(success)
+        self.assertIsNotNone(pairs)
 
 
 if __name__ == '__main__':

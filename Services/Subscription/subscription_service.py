@@ -1,19 +1,16 @@
-# TODO: get imports once the needed modules are implemented
+from DAO.subscription_dao import SubscriptionDAO
 
 
-# TODO: add docs once service is implemented
+# TODO: add docs
 class SubscriptionService:
     def __init__(self):
-        self.subscription_dao = None  # TODO: get the actual subscription dao once it's implemented
+        self.subscription_dao = SubscriptionDAO()
 
-    # TODO: implement and add docs when subscription dao is implemented
     def create_subscription(self, user_id, subscription_type, subscription_cost):
-        pass
+        return self.subscription_dao.insert_new_subscription(user_id, subscription_type, subscription_cost)
 
-    # TODO: implement and add docs when subscription dao is implemented
     def update_subscription(self, user_id, subscription_type, subscription_cost):
-        pass
+        return self.subscription_dao.update_subscription(user_id, subscription_type, subscription_cost)
 
-    # TODO: implement and add docs when subscription dao is implemented
     def get_monthly_bill(self, user_id):
-        pass
+        return self.subscription_dao.get_monthly_bill(user_id)

@@ -148,12 +148,12 @@ class UserDAO:
         # Make sure the parameters are valid
         valid_parameters = self._check_insert_new_user_parameters(username, first_name, last_name)
 
-        # Return False plus an error message if the parameters are invalid
+        # Return null plus an error message if the parameters are invalid
         if not valid_parameters:
-            return False, 'Invalid new user parameters'
+            return None, 'Invalid new user parameters'
 
         if self._check_user_exists(username):
-            return False, 'Username already in use'
+            return None, 'Username already in use'
 
         # Generate a new user ID
         new_user_id = self._generate_user_id(username, first_name, last_name)
@@ -169,8 +169,8 @@ class UserDAO:
         self.connection.commit()
         self.connection.close()
 
-        # Return True and a null error message
-        return True, None
+        # Return the user ID and a null error message
+        return new_user_id, None
 
     """
     A helper function for checking the parameters passed in when trying to get user based on their first and last name
@@ -208,7 +208,7 @@ class UserDAO:
         # Make sure the parameters are valid
         valid_parameters = self._check_get_user_by_name_parameters(first_name, last_name)
 
-        # Return False plus an error message if the parameters are invalid
+        # Return null plus an error message if the parameters are invalid
         if not valid_parameters:
             return None, 'Invalid get user by name parameters'
 
@@ -273,3 +273,18 @@ class UserDAO:
         self.connection.close()
 
         return True, None
+
+    def login(self, username, password):
+        # Connect to the database
+        self.connection = sqlite3.connect(self.db_file_path)
+        cursor = self.connection.cursor()
+
+        # Get the user based on their first and last name
+        cursor.execute("SELECT user_id FROM users WHERE username = '{}' AND password = '{}'".format(username, password))
+        user_id = cursor.fetchone()
+
+        self.connection.commit()
+        self.connection.close()
+
+        # Return the user and a null error message
+        return user_id, None
