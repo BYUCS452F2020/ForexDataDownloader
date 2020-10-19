@@ -90,7 +90,7 @@ class FollowedPairsLeftDAO:
 
     def decrement_followed_pairs_left(self, user_id):
         if not isinstance(user_id, str):
-            return None, 'Invalid user ID; should be a string'
+            return False, 'Invalid user ID; should be a string'
 
         # Connect to the database
         self.connection = sqlite3.connect(self.db_file_path)
