@@ -2,10 +2,9 @@ from Services.CurrencyPair.currency_pair_service import CurrencyPairService
 from Services.DataDownload.data_download_service import DataDownloadService
 from Services.Subscription.subscription_service import SubscriptionService
 from Services.User.user_service import UserService
-import math
 
 
-# TODO: add documentation/comments once fully implemented
+# TODO: add docs
 class ServiceFacade:
     def __init__(self):
         self.currency_pair_service = CurrencyPairService()
@@ -14,63 +13,95 @@ class ServiceFacade:
         self.user_service = UserService()
         self.subscription_types_and_costs = {'Basic': 5.99, 'Premium': 9.99}
 
-    # TODO: finish and add docs when currency pair service is fully implemented
     def get_available_currency_pairs(self):
-        available_pairs = self.currency_pair_service.get_available_currency_pairs()
+        return self.currency_pair_service.get_available_currency_pairs()
 
-    # TODO: finish and add docs when currency pair service is fully implemented
     def get_pairs_followed_for_user(self, user_id):
-        pairs_followed_for_user = self.currency_pair_service.get_pairs_followed_for_user(user_id)
+        return self.currency_pair_service.get_pairs_followed_for_user(user_id)
 
-    # TODO: finish and add docs when currency pair service is fully implemented
     def update_pairs_followed_for_user(self, user_id, currency_pair_name):
-        pairs_left = self.get_followed_pairs_left_for_user(user_id)
+        pairs_left, error_message = self.get_followed_pairs_left_for_user(user_id)
 
-        if pairs_left != -math.inf and pairs_left > 0:
-            self.currency_pair_service.update_pairs_followed_for_user(user_id, currency_pair_name)
-            self.update_followed_pairs_left_for_user(user_id)
+        if error_message is not None:
+            return error_message
 
-    # TODO: finish and add docs when currency pair service is fully implemented
+        pairs_left = pairs_left[0]
+
+        if pairs_left == -1 or pairs_left > 0:
+            first_update_success, first_error_message = self.currency_pair_service.update_pairs_followed_for_user(user_id, currency_pair_name)
+            second_update_success, second_error_message = self.decrement_followed_pairs_left_for_user(user_id)
+
+            if first_update_success and second_update_success:
+                return_message = 'Successfully updated pairs followed'
+
+            else:
+                return_message = 'Failed to update pairs followed'
+
+        else:
+            return_message = 'Cannot update pairs followed for user - monthly limit reached'
+
+        return return_message
+
     def get_followed_pairs_left_for_user(self, user_id):
-        pairs_left = self.currency_pair_service.get_followed_pairs_left_for_user(user_id)
+        return self.currency_pair_service.get_followed_pairs_left_for_user(user_id)
 
-    # TODO: finish and add docs when currency pair service is fully implemented
-    def update_followed_pairs_left_for_user(self, user_id):
-        change_amount = 1
-        self.currency_pair_service.update_pairs_followed_for_user(user_id, change_amount)
+    def update_followed_pairs_left_for_user(self, user_id, num_pairs_available):
+        return self.currency_pair_service.update_followed_pairs_left_for_user(user_id, num_pairs_available)
 
-    # TODO: test this and possibly change the format of the returned candle data
+    def insert_followed_pairs_left_for_user(self, user_id, num_pairs_available):
+        return self.currency_pair_service.insert_followed_pairs_left_for_user(user_id, num_pairs_available)
+
+    def decrement_followed_pairs_left_for_user(self, user_id):
+        return self.currency_pair_service.decrement_followed_pairs_left(user_id)
+
     def get_historical_data(self, currency_pair, time_frame_granularity, from_time, to_time):
         candles, error_message = self.data_download_service.get_historical_data(currency_pair, time_frame_granularity,
                                                                                 from_time, to_time)
 
         return candles, error_message
 
-    # TODO: test this once the subscription service is fully implemented and handle the error
     def create_subscription(self, user_id, subscription_type):
         if subscription_type in self.subscription_types_and_costs:
             subscription_cost = self.subscription_types_and_costs[subscription_type]
-            self.subscription_service.create_subscription(user_id, subscription_type, subscription_cost)
+            return self.subscription_service.create_subscription(user_id, subscription_type, subscription_cost)
 
         else:
-            # error  # TODO: change this
-            pass
+            return False, 'Invalid subscription type'
 
-    # TODO: test this once the subscription service is fully implemented and handle the error
     def update_subscription(self, user_id, subscription_type):
         if subscription_type in self.subscription_types_and_costs:
             subscription_cost = self.subscription_types_and_costs[subscription_type]
-            self.subscription_service.update_subscription(user_id, subscription_type, subscription_cost)
+            first_success, first_error_message = self.subscription_service.update_subscription(user_id, subscription_type, subscription_cost)
+            second_success = False
+
+            if first_success:
+                second_success, second_error_message = self.update_followed_pairs_left_for_user(user_id, -1)
+
+            return 'Updated subscription' if first_success and second_success else 'Failed to update subscription'
 
         else:
-            # error  # TODO: change this
-            pass
+            return 'Invalid subscription type'
 
-    # TODO: finish and add docs when user service is fully implemented
-    def create_user(self, username, first_name, last_name, subscription_type):
-        user_id = self.user_service.create_user(username, first_name, last_name)
-        self.create_subscription(user_id, subscription_type)
+    def create_user(self, username, first_name, last_name, password, subscription_type):
+        user_id, first_error_message = self.user_service.create_user(username, first_name, last_name, password)
 
-    # TODO: finish and add docs when user service is fully implemented
+        if first_error_message is not None:
+            return None, first_error_message
+
+        first_success, second_error_message = self.create_subscription(user_id, subscription_type)
+
+        if not first_success:
+            return None, second_error_message
+
+        second_success, third_error_message = self.insert_followed_pairs_left_for_user(user_id, 5)
+
+        if not second_success:
+            return None, third_error_message
+
+        return user_id, third_error_message
+
     def login(self, username, password):
-        self.user_service.login(username, password)
+        return self.user_service.login(username, password)
+
+    def get_monthly_bill(self, user_id):
+        return self.subscription_service.get_monthly_bill(user_id)

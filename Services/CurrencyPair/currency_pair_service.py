@@ -25,5 +25,8 @@ class CurrencyPairService:
     def update_followed_pairs_left_for_user(self, user_id, num_pairs_available):
         return self.followed_pairs_left_dao.update_followed_pairs_left(user_id, num_pairs_available)
 
+    def insert_followed_pairs_left_for_user(self, user_id, num_pairs_available):
+        return self.followed_pairs_left_dao.insert_new_followed_pairs_left(user_id, num_pairs_available)
+
     def decrement_followed_pairs_left(self, user_id):
         return self.followed_pairs_left_dao.decrement_followed_pairs_left(user_id)
