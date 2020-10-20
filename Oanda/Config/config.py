@@ -7,7 +7,7 @@ config_vars = {
     'username': 'cs452datadownloader',
     'date_format': 'UNIX',
     'account': '101-001-16464625-001',
-    'db_file_path': '/Users/mymac/Google_Drive/CS/CS452/ForexDataDownloader/ForexDataDownloader/Database/forex.db'
+    'db_file_path': 'C:/Users/Caleb-PC/PycharmProjects/ForexDataDownloader/Database/forex.db'
 }
 
 

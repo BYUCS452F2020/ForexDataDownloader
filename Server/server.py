@@ -21,11 +21,22 @@ class Handler(BaseHTTPRequestHandler):
 
         return request_body
 
+    def _send_CORS_headers(self):
+        # Sets headers required for CORS
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "x-api-key,Content-Type")
+        self.end_headers()
+
     def _send_response(self, code):
         self.send_response(code)
         # Do we need this?
         # self.send_header('Content-type', 'text/html')
         self.end_headers()
+
+    def do_OPTIONS(self):
+        self._send_CORS_headers()
 
     def do_GET(self):
         if self.path == '/getAvailablePairs':
