@@ -71,11 +71,15 @@ class ServiceFacade:
     def update_subscription(self, user_id, subscription_type):
         if subscription_type in self.subscription_types_and_costs:
             subscription_cost = self.subscription_types_and_costs[subscription_type]
-            first_success, first_error_message = self.subscription_service.update_subscription(user_id, subscription_type, subscription_cost)
+            first_success, first_error_message = self.subscription_service.update_subscription(user_id,
+                                                                                               subscription_type,
+                                                                                               subscription_cost)
             second_success = False
 
             if first_success:
-                second_success, second_error_message = self.update_followed_pairs_left_for_user(user_id, -1)
+                num_pairs_available = -1 if subscription_type == 'Premium' else 5
+                second_success, second_error_message = self.update_followed_pairs_left_for_user(user_id,
+                                                                                                num_pairs_available)
 
             return 'Updated subscription' if first_success and second_success else 'Failed to update subscription'
 
@@ -93,7 +97,8 @@ class ServiceFacade:
         if not first_success:
             return None, second_error_message
 
-        second_success, third_error_message = self.insert_followed_pairs_left_for_user(user_id, 5)
+        num_pairs_available = -1 if subscription_type == 'Premium' else 5
+        second_success, third_error_message = self.insert_followed_pairs_left_for_user(user_id, num_pairs_available)
 
         if not second_success:
             return None, third_error_message
