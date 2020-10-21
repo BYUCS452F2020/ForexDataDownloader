@@ -82,5 +82,5 @@ class PairsFollowedDAO:
 
         self.connection.commit()
         self.connection.close()
-
+        # This is a test
         return pairs_followed, None
