@@ -59,6 +59,17 @@ class PairsFollowedDAO:
         self.connection.close()
 
         return True, None
+    
+    def remove_pair_followed(self, user_id, currency_name):
+        self.connection = sqlite3.connect(self.db_file_path)
+        cursor = self.connection.cursor()
+
+        cursor.execute("DELETE FROM pairs_followed WHERE user_id = '{}' AND currency_name = '{}'".format(new_pair_followed_id, user_id, currency_name))
+
+        self.connection.commit()
+        self.connection.close()
+
+        return True, None
 
     def get_pairs_followed(self, user_id):
         # Connect to the database
