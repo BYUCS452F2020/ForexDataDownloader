@@ -11,7 +11,7 @@ class ServiceFacadeTest(unittest.TestCase):
         pairs, error_message = self.service_facade.get_available_currency_pairs()
 
         self.assertIsNotNone(pairs)
-        self.assertEqual(len(pairs), 6)
+        self.assertEqual(len(pairs), 7)
         self.assertIsNone(error_message)
 
     def test_create_user(self):
