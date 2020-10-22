@@ -11,16 +11,6 @@ class Handler(BaseHTTPRequestHandler):
         self.service_facade = ServiceFacade()
         self.request_id = BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
-    def _format_request_body(self, body):
-        key_val_pairs = body.split('&')
-        request_body = {}
-
-        for pair in key_val_pairs:
-            key, val = pair.split('=')
-            request_body[key] = val
-
-        return request_body
-
     def _send_CORS_headers(self):
         # Sets headers required for CORS
         self.send_response(200)
@@ -60,7 +50,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/getPairsFollowed':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             user_id = request_body['user_id']
 
@@ -84,7 +74,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/getFollowedPairsLeft':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             user_id = request_body['user_id']
 
@@ -103,16 +93,12 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/getHistoricalData':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             currency_pair = request_body['currency_pair']
             time_frame_granularity = request_body['time_frame_granularity']
             from_time = request_body['from_time']
-            from_time = from_time.replace('+', ' ')
-            from_time = from_time.replace('%3A', ':')
             to_time = request_body['to_time']
-            to_time = to_time.replace('+', ' ')
-            to_time = to_time.replace('%3A', ':')
 
             candles, error_message = self.service_facade.get_historical_data(currency_pair, time_frame_granularity,
                                                                              from_time, to_time)
@@ -129,7 +115,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/getMonthlyBill':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             user_id = request_body['user_id']
 
@@ -149,7 +135,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == '/updatePairsFollowed':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             user_id = request_body['user_id']
             currency_pair_name = request_body['currency_pair_name']
@@ -166,7 +152,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/updateSubscription':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             user_id = request_body['user_id']
             subscription_type = request_body['subscription_type']
@@ -183,7 +169,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/createUser':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             username = request_body['username']
             first_name = request_body['first_name']
@@ -207,7 +193,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/login':
             content_len = int(self.headers['Content-Length'])
             post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = self._format_request_body(post_body)
+            request_body = json.loads(post_body)
 
             username = request_body['username']
             password = request_body['password']

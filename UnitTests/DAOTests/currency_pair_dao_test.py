@@ -21,6 +21,10 @@ class CurrencyPairDaoTest(unittest.TestCase):
         self.currency_pair_dao.add_currency_pair('EUR/USD')
         self.currency_pair_dao.add_currency_pair('USD/JPY')
         self.currency_pair_dao.add_currency_pair('GBP/USD')
+        self.currency_pair_dao.add_currency_pair('USD/CHF')
+        self.currency_pair_dao.add_currency_pair('AUD/USD')
+        self.currency_pair_dao.add_currency_pair('USD/CAD')
+        self.currency_pair_dao.add_currency_pair('NZD/USD')
 
         pairs, error_message = self.currency_pair_dao.get_all_currency_pairs()
 
