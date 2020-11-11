@@ -1,10 +1,10 @@
-from DAO.subscription_dao import SubscriptionDAO
+from MongoDAO.mongo_subscription_dao import MongoSubscriptionDAO
 
 
 # TODO: add docs
 class SubscriptionService:
     def __init__(self):
-        self.subscription_dao = SubscriptionDAO()
+        self.subscription_dao = MongoSubscriptionDAO()
 
     def create_subscription(self, user_id, subscription_type, subscription_cost):
         return self.subscription_dao.insert_new_subscription(user_id, subscription_type, subscription_cost)

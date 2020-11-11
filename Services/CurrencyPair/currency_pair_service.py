@@ -1,14 +1,14 @@
-from DAO.currency_pair_dao import CurrencyPairDAO
-from DAO.followed_pairs_left_dao import FollowedPairsLeftDAO
-from DAO.pairs_followed_dao import PairsFollowedDAO
+from MongoDAO.mongo_currency_pair_dao import MongoCurrencyPairDAO
+from MongoDAO.mongo_followed_pairs_left_dao import MongoFollowedPairsLeftDAO
+from MongoDAO.mongo_pairs_followed_dao import MongoPairsFollowedDAO
 
 
 # TODO: add docs
 class CurrencyPairService:
     def __init__(self):
-        self.currency_pair_dao = CurrencyPairDAO()
-        self.followed_pairs_left_dao = FollowedPairsLeftDAO()
-        self.pair_followed_dao = PairsFollowedDAO()
+        self.currency_pair_dao = MongoCurrencyPairDAO()
+        self.followed_pairs_left_dao = MongoFollowedPairsLeftDAO()
+        self.pair_followed_dao = MongoPairsFollowedDAO()
 
     def get_available_currency_pairs(self):
         return self.currency_pair_dao.get_all_currency_pairs()

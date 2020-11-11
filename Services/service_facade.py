@@ -25,8 +25,6 @@ class ServiceFacade:
         if error_message is not None:
             return error_message
 
-        pairs_left = pairs_left[0]
-
         if pairs_left == -1 or pairs_left > 0:
             first_update_success, first_error_message = self.currency_pair_service.update_pairs_followed_for_user(user_id, currency_pair_name)
             second_update_success, second_error_message = self.decrement_followed_pairs_left_for_user(user_id)

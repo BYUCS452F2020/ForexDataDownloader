@@ -40,7 +40,7 @@ class Handler(BaseHTTPRequestHandler):
             pairs = []
 
             for pair in available_pairs:
-                pairs.append(pair[0])
+                pairs.append(pair)
 
             pairs_json = json.dumps(pairs)
 
@@ -64,7 +64,7 @@ class Handler(BaseHTTPRequestHandler):
             followed_pairs = []
 
             for pair in followed_pairs_for_user:
-                followed_pairs.append(pair[0])
+                followed_pairs.append(pair)
 
             followed_pairs_json = json.dumps(followed_pairs)
 
@@ -85,7 +85,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(error_message.encode())
                 return
 
-            pairs_left_json = json.dumps(pairs_left[0])
+            pairs_left_json = json.dumps(pairs_left)
 
             self._send_response(200)
             self.wfile.write(pairs_left_json.encode())
@@ -126,7 +126,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(error_message.encode())
                 return
 
-            monthly_bill_json = json.dumps(monthly_bill[0])
+            monthly_bill_json = json.dumps(monthly_bill)
 
             self._send_response(200)
             self.wfile.write(monthly_bill_json.encode())
@@ -205,7 +205,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(error_message.encode())
                 return
 
-            user_id_json = json.dumps(user_id[0])
+            user_id_json = json.dumps(user_id)
 
             self._send_response(200)
             self.wfile.write(user_id_json.encode())
