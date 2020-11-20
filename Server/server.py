@@ -13,23 +13,100 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send_CORS_headers(self):
         # Sets headers required for CORS
-        self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "x-api-key,Content-Type")
         self.end_headers()
-
+        
     def _send_response(self, code):
         self.send_response(code)
         # Do we need this?
         # self.send_header('Content-type', 'text/html')
-        self.end_headers()
-
-    def do_OPTIONS(self):
         self._send_CORS_headers()
+        
+    def do_OPTIONS(self):
+        self._send_response(200)
 
-    def do_GET(self):
-        if self.path == '/getAvailablePairs':
+    def do_POST(self):
+        if self.path == '/updatePairsFollowed':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = json.loads(post_body)
+
+            user_id = request_body['user_id']
+            currency_pair_name = request_body['currency_pair_name']
+
+            message = self.service_facade.update_pairs_followed_for_user(user_id, currency_pair_name)
+
+            if message != 'Successfully updated pairs followed':
+                self._send_response(404)
+                self.wfile.write(message.encode())
+                return
+
+            self._send_response(200)
+
+        elif self.path == '/updateSubscription':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = json.loads(post_body)
+
+            user_id = request_body['user_id']
+            subscription_type = request_body['subscription_type']
+
+            message = self.service_facade.update_subscription(user_id, subscription_type)
+
+            if message != 'Updated subscription':
+                self._send_response(404)
+                self.wfile.write(message.encode())
+                return
+
+            self._send_response(200)
+
+        elif self.path == '/createUser':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = json.loads(post_body)
+
+            username = request_body['username']
+            first_name = request_body['first_name']
+            last_name = request_body['last_name']
+            password = request_body['password']
+            subscription_type = request_body['subscription_type']
+
+            user_id, error_message = self.service_facade.create_user(username, first_name, last_name, password,
+                                                                     subscription_type)
+
+            if error_message is not None:
+                self._send_response(404)
+                self.wfile.write(error_message.encode())
+                return
+
+            user_id_json = json.dumps(user_id)
+
+            self._send_response(200)
+            self.wfile.write(user_id_json.encode())
+
+        elif self.path == '/login':
+            content_len = int(self.headers['Content-Length'])
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            request_body = json.loads(post_body)
+
+            username = request_body['username']
+            password = request_body['password']
+
+            user_id, error_message = self.service_facade.login(username, password)
+
+            if error_message is not None:
+                self._send_response(404)
+                self.wfile.write(error_message.encode())
+                return
+
+            user_id_json = json.dumps(user_id)
+
+            self._send_response(200)
+            self.wfile.write(user_id_json.encode())
+        
+        elif self.path == '/getAvailablePairs':
             available_pairs, error_message = self.service_facade.get_available_currency_pairs()
 
             if error_message is not None:
@@ -130,85 +207,6 @@ class Handler(BaseHTTPRequestHandler):
 
             self._send_response(200)
             self.wfile.write(monthly_bill_json.encode())
-
-    def do_POST(self):
-        if self.path == '/updatePairsFollowed':
-            content_len = int(self.headers['Content-Length'])
-            post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = json.loads(post_body)
-
-            user_id = request_body['user_id']
-            currency_pair_name = request_body['currency_pair_name']
-
-            message = self.service_facade.update_pairs_followed_for_user(user_id, currency_pair_name)
-
-            if message != 'Successfully updated pairs followed':
-                self._send_response(404)
-                self.wfile.write(message.encode())
-                return
-
-            self._send_response(200)
-
-        elif self.path == '/updateSubscription':
-            content_len = int(self.headers['Content-Length'])
-            post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = json.loads(post_body)
-
-            user_id = request_body['user_id']
-            subscription_type = request_body['subscription_type']
-
-            message = self.service_facade.update_subscription(user_id, subscription_type)
-
-            if message != 'Updated subscription':
-                self._send_response(404)
-                self.wfile.write(message.encode())
-                return
-
-            self._send_response(200)
-
-        elif self.path == '/createUser':
-            content_len = int(self.headers['Content-Length'])
-            post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = json.loads(post_body)
-
-            username = request_body['username']
-            first_name = request_body['first_name']
-            last_name = request_body['last_name']
-            password = request_body['password']
-            subscription_type = request_body['subscription_type']
-
-            user_id, error_message = self.service_facade.create_user(username, first_name, last_name, password,
-                                                                     subscription_type)
-
-            if error_message is not None:
-                self._send_response(404)
-                self.wfile.write(error_message.encode())
-                return
-
-            user_id_json = json.dumps(user_id)
-
-            self._send_response(200)
-            self.wfile.write(user_id_json.encode())
-
-        elif self.path == '/login':
-            content_len = int(self.headers['Content-Length'])
-            post_body = self.rfile.read(content_len).decode('utf-8')
-            request_body = json.loads(post_body)
-
-            username = request_body['username']
-            password = request_body['password']
-
-            user_id, error_message = self.service_facade.login(username, password)
-
-            if error_message is not None:
-                self._send_response(404)
-                self.wfile.write(error_message.encode())
-                return
-
-            user_id_json = json.dumps(user_id)
-
-            self._send_response(200)
-            self.wfile.write(user_id_json.encode())
 
 
 def main():

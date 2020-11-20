@@ -4,7 +4,7 @@ import json
 
 # Create a user
 headers = {'Content-Type': 'application/json'}
-data = {'username': 'homelander', 'first_name': 'Billy', 'last_name': 'Bob', 'password': 'a', 'subscription_type': 'Premium'}
+data = {'username': 'theBalladOf', 'first_name': 'Ricky', 'last_name': 'Bobby', 'password': 'a', 'subscription_type': 'Premium'}
 resp = req.post('http://localhost:8080/createUser', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
@@ -17,7 +17,7 @@ else:
 
 # Create the same user and make sure we get an error message
 headers = {'Content-Type': 'application/json'}
-data = {'username': 'homelander', 'first_name': 'Billy', 'last_name': 'Bob', 'password': 'a', 'subscription_type': 'Premium'}
+data = {'username': 'theBalladOf', 'first_name': 'Ricky', 'last_name': 'Bobby', 'password': 'a', 'subscription_type': 'Premium'}
 resp = req.post('http://localhost:8080/createUser', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
@@ -30,7 +30,7 @@ else:
 
 # Login and check the user id
 headers = {'Content-Type': 'application/json'}
-data = {'username': 'homelander', 'password': 'a'}
+data = {'username': 'theBalladOf', 'password': 'a'}
 resp = req.post('http://localhost:8080/login', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
@@ -45,7 +45,7 @@ else:
 # Get monthly bill
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getMonthlyBill', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getMonthlyBill', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         bill = json.loads(resp.text)
@@ -58,7 +58,7 @@ else:
 # Get the amount of pairs followed left
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         pairs_left = json.loads(resp.text)
@@ -80,7 +80,7 @@ if resp.status_code == 404:
 # Check to see if the monthly bill changed
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getMonthlyBill', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getMonthlyBill', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         bill = json.loads(resp.text)
@@ -93,7 +93,7 @@ else:
 # Check to see if the pairs followed left changed
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         pairs_left = json.loads(resp.text)
@@ -115,7 +115,7 @@ if resp.status_code == 404:
 # Check to see if the pairs followed left changed
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getFollowedPairsLeft', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         pairs_left = json.loads(resp.text)
@@ -128,7 +128,7 @@ else:
 # Look at the followed pairs
 headers = {'Content-Type': 'application/json'}
 data = {'user_id': user_id}
-resp = req.get('http://localhost:8080/getPairsFollowed', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getPairsFollowed', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         pairs_followed = json.loads(resp.text)
@@ -142,7 +142,7 @@ else:
 headers = {'Content-Type': 'application/json'}
 data = {'currency_pair': 'EUR_USD', 'time_frame_granularity': 'H1',
         'from_time': '2020-10-05 00:00:00', 'to_time': '2020-10-06 00:00:00'}
-resp = req.get('http://localhost:8080/getHistoricalData', headers=headers, data=json.dumps(data))
+resp = req.post('http://localhost:8080/getHistoricalData', headers=headers, data=json.dumps(data))
 
 if resp.status_code != 404:
         candles = json.loads(resp.text)
